@@ -1,15 +1,13 @@
 package com.example.gymcompse
 
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.gymcompse.ui.theme.GymsApiService
 import kotlinx.coroutines.*
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -27,6 +25,9 @@ class GymViewModel : ViewModel() {
     // request gyms list
     private val job = Job()
     val scope = CoroutineScope(context = job + Dispatchers.IO)
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
 
     init {
         val retrofit: Retrofit =
@@ -38,13 +39,17 @@ class GymViewModel : ViewModel() {
     }
 
     private fun getGyms() {
-        scope.launch {
-            val gyms = apiService.getGymsList() as MutableList<Gym>
-            withContext(Dispatchers.Main) {
-                _state.value = gyms
-            }
+        viewModelScope.launch(exceptionHandler) {
+            val gyms = getGymsFromRemoteServer()
+            _state.value = gyms.toMutableList()
         }
     }
+
+    // Retroift Interface call to get gyms list
+    private suspend fun getGymsFromRemoteServer() = withContext(Dispatchers.IO) {
+        apiService.getGymsList()
+    }
+
 
     fun toggleFavorite(gymId: Int) {
         _state.value?.let { gyms ->
@@ -56,8 +61,11 @@ class GymViewModel : ViewModel() {
         }
     }
 
+
     override fun onCleared() {
         super.onCleared()
         job.cancel()
     }
 }
+
+
