@@ -3,9 +3,10 @@ package com.example.gymcompse
 import com.google.gson.annotations.SerializedName
 
 data class Gym(
-    val id: Int,
-    @SerializedName("gym_name") val name: String,
-    @SerializedName("gym_location") val location: String,
+    val id: Int = 0,
+    @SerializedName("gym_name") val name: String = "",
+    @SerializedName("gym_location") val location: String = "",
+    @SerializedName("is_open") var isOpen:Boolean = false,
     var isFavorite: Boolean = false
 )
 

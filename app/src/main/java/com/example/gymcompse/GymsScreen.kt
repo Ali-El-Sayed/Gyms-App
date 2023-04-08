@@ -26,21 +26,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
-fun GymsScreen() {
+fun GymsScreen(onItemClick: (id: Int) -> Unit) {
     val viewModel: GymViewModel = viewModel()
     val gymList = viewModel.state.observeAsState().value ?: mutableListOf()
 
     LazyColumn {
         items(gymList) { gym ->
-            GymItem(gym) { viewModel.toggleFavorite(it) }
+            GymItem(gym = gym,
+                onFavouriteIconClick = { viewModel.toggleFavorite(gym.id) },
+                onItemClick = { onItemClick(gym.id) })
         }
     }
 }
 
 @Composable
-fun GymItem(gym: Gym, onClick: (Int) -> Unit) {
-    var icon = if (gym.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
-    Card(elevation = 4.dp, modifier = Modifier.padding(8.dp)) {
+fun GymItem(gym: Gym, onFavouriteIconClick: (Int) -> Unit, onItemClick: () -> Unit) {
+    val icon = if (gym.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
+    Card(elevation = 4.dp, modifier = Modifier
+        .padding(8.dp)
+        .clickable { onItemClick() }) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
             DefaultIcon(
                 Icons.Filled.Place, Modifier.weight(0.15f), contentDescription = "Location"
@@ -48,7 +52,7 @@ fun GymItem(gym: Gym, onClick: (Int) -> Unit) {
             GymDetails(gym, Modifier.weight(0.70f))
             DefaultIcon(
                 icon, Modifier.weight(0.15f), contentDescription = "Favorite"
-            ) { onClick(gym.id) }
+            ) { onFavouriteIconClick(gym.id) }
         }
     }
 }
@@ -68,8 +72,10 @@ fun DefaultIcon(
 }
 
 @Composable
-fun GymDetails(gym: Gym, modifier: Modifier) {
-    Column(modifier = modifier) {
+fun GymDetails(
+    gym: Gym, modifier: Modifier, horizontalAlignment: Alignment.Horizontal = Alignment.Start
+) {
+    Column(modifier = modifier, horizontalAlignment = horizontalAlignment) {
         Text(
             text = gym.name,
             fontWeight = FontWeight.Bold,
@@ -87,10 +93,10 @@ fun GymDetails(gym: Gym, modifier: Modifier) {
     }
 }
 
-@Preview(
-    showBackground = true
-)
-@Composable
-fun GymScreenPreview() {
-    GymsScreen()
-}
+//@Preview(
+//    showBackground = true
+//)
+//@Composable
+//fun GymScreenPreview() {
+//    GymsScreen()
+//}
