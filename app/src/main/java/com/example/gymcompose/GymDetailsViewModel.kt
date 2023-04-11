@@ -1,7 +1,7 @@
-package com.example.gymcompse
+package com.example.gymcompose
 
 import androidx.lifecycle.*
-import com.example.gymcompse.ui.theme.GymsApiService
+import com.example.gymcompose.ui.theme.GymsApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -1,10 +1,10 @@
-package com.example.gymcompse
+package com.example.gymcompose
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymcompse.ui.theme.GymsApiService
+import com.example.gymcompose.ui.theme.GymsApiService
 import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -17,6 +17,8 @@ class GymViewModel : ViewModel() {
     private var _state = MutableLiveData(mutableListOf<Gym>())
     val state: LiveData<MutableList<Gym>>
         get() = _state
+
+    private var gymsDao = GymsDatabase.getDaoInstance(GymsApplication.getApplicationContext())
 
     private lateinit var gymsCall: Call<List<Gym>>
     private var apiService: GymsApiService
@@ -46,20 +48,35 @@ class GymViewModel : ViewModel() {
 
     // Retroift Interface call to get gyms list
     private suspend fun getGymsFromRemoteServer() = withContext(Dispatchers.IO) {
-        apiService.getGymsList()
-    }
+        //try catch block to handle exceptions
+        try {
+            val gymsList = apiService.getGymsList()
+            gymsDao.insertAll(gymsList)
+            return@withContext gymsList // return to the caller in the main thread
+        } catch (e: Exception) {
+            e.printStackTrace()
+            gymsDao.getAll()
+        }
 
+    }
 
     fun toggleFavorite(gymId: Int) {
         _state.value?.let { gyms ->
             val updatedGyms = gyms.map { gym ->
-                if (gym.id == gymId) gym.copy(isFavorite = !gym.isFavorite)
+                if (gym.id == gymId) gym.copy(isFavourite = !gym.isFavourite)
                 else gym
             }
             _state.value = updatedGyms.toMutableList()
+            viewModelScope.launch(exceptionHandler) {
+                _state.value?.get(gymId)?.let { toggleFavouriteGym(gymId, !it.isFavourite) }
+            }
         }
     }
 
+    private suspend fun toggleFavouriteGym(gymId: Int, currentFavouriteState: Boolean) =
+        withContext(Dispatchers.IO) {
+            gymsDao.update(GymFavouriteState(gymId, !currentFavouriteState))
+        }
 
     override fun onCleared() {
         super.onCleared()

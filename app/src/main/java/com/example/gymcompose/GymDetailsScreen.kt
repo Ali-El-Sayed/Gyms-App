@@ -1,4 +1,4 @@
-package com.example.gymcompse
+package com.example.gymcompose
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

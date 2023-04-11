@@ -1,7 +1,6 @@
-package com.example.gymcompse.ui.theme
+package com.example.gymcompose.ui.theme
 
-import com.example.gymcompse.Gym
-import retrofit2.Call
+import com.example.gymcompose.Gym
 import retrofit2.http.GET
 import retrofit2.http.Query
 

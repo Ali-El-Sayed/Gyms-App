@@ -1,4 +1,4 @@
-package com.example.gymcompse
+package com.example.gymcompose
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -41,7 +40,7 @@ fun GymsScreen(onItemClick: (id: Int) -> Unit) {
 
 @Composable
 fun GymItem(gym: Gym, onFavouriteIconClick: (Int) -> Unit, onItemClick: () -> Unit) {
-    val icon = if (gym.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
+    val icon = if (gym.isFavourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
     Card(elevation = 4.dp, modifier = Modifier
         .padding(8.dp)
         .clickable { onItemClick() }) {
@@ -92,11 +91,3 @@ fun GymDetails(
         }
     }
 }
-
-//@Preview(
-//    showBackground = true
-//)
-//@Composable
-//fun GymScreenPreview() {
-//    GymsScreen()
-//}
